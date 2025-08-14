@@ -65,8 +65,7 @@ flowchart LR
     Glue[Glue/EMR]
   end
   subgraph TRAINING
-    SageMaker["SageMaker Training
-Pipeline"]
+    SageMaker["SageMaker Training Pipeline"]
     FeatureStore["Feature Store"]
   end
   subgraph STREAM

@@ -1,0 +1,13 @@
+col_name,max_val,min_val,high_val,low_val,unique_count,nan_count,inf_count,candidate_vals,candidate_len,numeric_col_type,conf_max_val,conf_min_val,conf_fill_na_val,conf_candidate_vals,conf_candidate_len
+C1,1012,1001,1005.0,1002.0,7,0,0,"UNKNOWN,1001,1002,1005,1007,1008,1010,1012",8,cate_num_feat&general_num_feat,1005.0,1002.0,1002.0,"UNKNOWN,1001,1002,1005,1007,1008,1010,1012",8
+banner_pos,7,0,1.0,0.0,7,0,0,"UNKNOWN,0,1,2,3,4,5,7",8,cate_num_feat&general_num_feat,1.0,0.0,0.0,"UNKNOWN,0,1,2,3,4,5,7",8
+device_type,5,0,1.0,0.0,4,0,0,"UNKNOWN,0,1,4,5",5,cate_num_feat&general_num_feat,1.0,0.0,0.0,"UNKNOWN,0,1,4,5",5
+device_conn_type,5,0,3.0,0.0,4,0,0,"UNKNOWN,0,2,3,5",5,cate_num_feat&general_num_feat,3.0,0.0,0.0,"UNKNOWN,0,2,3,5",5
+C14,24043,375,23561.0,6392.0,1517,0,0,,0,general_num_feat,23561.0,6392.0,6392.0,,0
+C15,1024,120,320.0,300.0,8,0,0,"UNKNOWN,120,216,300,320,480,728,768,1024",9,cate_num_feat&general_num_feat,320.0,300.0,300.0,"UNKNOWN,120,216,300,320,480,728,768,1024",9
+C16,1024,20,90.0,50.0,9,0,0,"UNKNOWN,20,36,50,90,250,320,480,768,1024",10,cate_num_feat&general_num_feat,90.0,50.0,50.0,"UNKNOWN,20,36,50,90,250,320,480,768,1024",10
+C17,2757,112,2691.0,544.0,385,0,0,,0,general_num_feat,2691.0,544.0,544.0,,0
+C18,3,0,3.0,0.0,4,0,0,"UNKNOWN,0,1,2,3",5,cate_num_feat&general_num_feat,3.0,0.0,0.0,"UNKNOWN,0,1,2,3",5
+C19,1839,33,1063.0,35.0,63,0,0,,0,general_num_feat,1063.0,35.0,35.0,,0
+C20,100248,-1,100190.0,-1.0,152,0,0,,0,general_num_feat,100190.0,-1.0,-1.0,,0
+C21,255,1,221.0,23.0,60,0,0,,0,general_num_feat,221.0,23.0,23.0,,0

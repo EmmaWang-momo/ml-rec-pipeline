@@ -1,0 +1,12 @@
+2025-08-13 [Avazu_CTR_50K]
+xgb:
+Accuracy: 0.8476
+AUC: 0.7021
+
+dcn:
+val_auc: 0.7024
+
+2025-08-14 [Ali_ad]
+xgb:
+Accuracy: 0.9487
+AUC: 0.5552

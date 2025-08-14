@@ -11,13 +11,13 @@ pipelines/                # SageMaker Pipeline implementation (training, validat
   └─ templates/
 models/                   # DCN model code, stacking/parallel variants, export & viz
   ├─ dcn/                  # TF DCN implementation (cross + deep) + training scripts
-  ├─ stacked_dcn/          # 并联/堆叠 DCN variants (ensembling logic)
+  ├─ stacked_dcn/          # Parallel/stacked DCN variants (ensembling logic)
   ├─ export/               # SavedModel + ONNX export helpers + input spec
-  └─ viz/                  # 权重/embedding 可视化 notebooks (umap/t-SNE)
-realtime/                 # 在线 serving + routing + A/B 分流 + metrics client
+  └─ viz/                  # Weight/embedding visualization notebooks (UMAP/t-SNE)
+realtime/                 # Online serving + routing + A/B splitting + metrics client
   ├─ inference/            # Dockerized TF Serving / ONNX Runtime / Triton config examples
-  ├─ router/               # feature-assembly, model client, bidding logic, REST/gRPC server
-  ├─ ab_router/            # 流量分流实现（hash-based / header-based）
+  ├─ router/               # feature assembly, model client, bidding logic, REST/gRPC server
+  ├─ ab_router/            # Traffic splitting implementations (hash-based / header-based)
   └─ deploy/               # ECS/EKS / SageMaker endpoint deployment descriptors
 stream/                   # Request generator + load-testing
   ├─ generator/            # Kafka (MSK) & Kinesis producers reading Avazu/iPinYou/Criteo
@@ -27,10 +27,10 @@ monitoring/               # Model Monitor & infra for logging/metrics
   ├─ model_monitor/        # SageMaker Model Monitor baseline job templates & detectors
   ├─ cloudwatch/           # CloudWatch Dashboards & Alarm CloudFormation templates
   └─ observability/        # Prometheus/Grafana manifests, Opensearch ingest pipelines
-report/                   # 离线/在线指标与实验报告 (notebooks + CSVs)
+report/                   # Offline/online metrics and experiment reports (notebooks + CSVs)
   ├─ offline_eval/         # HR@N, NDCG@N, eCPM simulations, counterfactual sim
-  ├─ latency_throughput/   # 延迟/吞吐基准数据及绘图 notebooks
-  └─ experiments/          # A/B 实验分析 + stability checks
+  ├─ latency_throughput/   # Latency/throughput benchmark data and plotting notebooks
+  └─ experiments/          # A/B experiment analysis + stability checks
 
 artifacts/
   ├─ saved_models/
@@ -40,23 +40,23 @@ artifacts/
 
 ---
 
-## README (概览)
+## README (Overview)
 
-该工程用于在 AWS 上搭建一个接近 RTB（实时竞价）场景的 DCN 推荐系统，从离线训练到低延迟在线推理，再到竞价函数、实验分流与监控。仓库已按功能模块拆分，目标交付以下内容：
+This project builds an RTB-like DCN recommendation system on AWS, covering the full pipeline from offline training to low-latency online inference, bidding logic, experiment traffic splitting, and monitoring. The repository is modularized by functionality and delivers:
 
-- 架构图（Mermaid & PNG）
-- SageMaker Pipeline（`pipelines/`）: 自动化训练、评估、模型注册
-- 模型实现（`models/`）: DCN 基线 + 并联/堆叠变体 + 导出工具 + 权重/embedding 可视化
-- 在线服务（`realtime/`）: Dockerized 推理镜像（TF/ONNX/Triton）、Router（feature assembly + bidding + A/B）
-- 请求流模拟（`stream/`）: 使用 Kafka/MSK 或 Kinesis 的 replay/generator + Locust 压测脚本
-- 监控（`monitoring/`）: SageMaker Model Monitor 配置、CloudWatch Dashboard 与告警模板
-- 报告（`report/`）: 离线 HR@N/NDCG@N、以及在线延迟 & 吞吐对比
+Architecture diagram (Mermaid & PNG)
+SageMaker Pipeline (pipelines/): automated training, evaluation, and model registration
+Model implementations (models/): DCN baseline + parallel/stacked variants + export tools + weight/embedding visualization
+Online serving (realtime/): Dockerized inference images (TF/ONNX/Triton), Router (feature assembly + bidding + A/B)
+Request streaming simulation (stream/): Kafka/MSK or Kinesis replay/generator + Locust load testing scripts
+Monitoring (monitoring/): SageMaker Model Monitor configs, CloudWatch dashboards and alarm templates
+Reports (report/): offline HR@N/NDCG@N, and online latency & throughput comparisons
 
 ---
 
 ## Architecture Diagram
 
-下面提供一个 Mermaid 源文件（`architecture_diagram.mmd`），可用 mermaid CLI 或在线渲染器导出为 PNG/SVG。
+Mermaid source file (architecture_diagram.mmd), renderable to PNG/SVG:
 
 ```mmd
 flowchart LR
@@ -98,34 +98,34 @@ Pipeline"]
 
 ---
 
-## Pipelines/ (SageMaker Pipeline) — 概要
+## Pipelines/ (SageMaker Pipeline) — Overview
 
-`pipelines/pipeline.py` 将实现完整的 CI 流程：
+`pipelines/pipeline.py` implements the complete CI/CD flow:
 
-1. 数据校验（Athena/Glue 查询）
-2. 特征工程（Spark on EMR 或 SageMaker Processing）
-3. 训练（SageMaker Training Job，支持 Spot）
-4. 模型评估（AUC / offline eCPM sim）
-5. 模型注册（SageMaker Model Registry）
-6. 自动部署（可选：到 SageMaker Real-Time Endpoint）
+Data validation (Athena/Glue queries)
+Feature engineering (Spark on EMR or SageMaker Processing)
+Training (SageMaker Training Job, Spot support)
+Model evaluation (AUC / offline eCPM simulation)
+Model registration (SageMaker Model Registry)
+Optional automatic deployment (SageMaker Real-Time Endpoint)
 
-交付将包括：Pipeline 代码、IAM role 模板、以及示例参数化配置（dev/staging/prod）。
+Deliverables include: pipeline code, IAM role templates, and example parameterized configs (dev/staging/prod).
 
 ---
 
 ## Models/
 
-- `models/dcn/`: TensorFlow DCN 的实现（cross layers + deep tower），训练脚本、超参配置、以及 local TF2 SavedModel 导出脚本（已包含 in-canvas 初版）。
-- `models/stacked_dcn/`: 并联（并行）以及堆叠（串接）DCN 模型的实现和离线融合示例（平均/加权/学习器融合）。
-- `models/export/`: SavedModel -> ONNX 转换脚本（使用 `tf2onnx`）与检查输入/输出名的工具。
-- `models/viz/`: embedding 权重可视化（UMAP / t-SNE notebooks），以及用于生成权重分布/梯度直方图的脚本。
+- `models/dcn/`: TensorFlow DCN implementation (cross layers + deep tower), training scripts, hyperparameter configs, and local TF2 SavedModel export scripts.
+- `models/stacked_dcn/`: Parallel and stacked DCN implementations and offline fusion examples (average/weighted/learner-based).
+- `models/export/`:  SavedModel → ONNX conversion scripts (tf2onnx) and input/output name checking tools.
+- `models/viz/`: Embedding weight visualization (UMAP / t-SNE notebooks) and scripts for generating weight distribution/gradient histograms.
 
 ---
 
 ## Realtime/
 
 - `realtime/inference/`:
-  - Dockerfile 示例：TF-Serving、ONNXRuntime、Triton（含 model config）
+  - Example Dockerfiles: TF-Serving, ONNXRuntime, Triton (with model config)
   - Perf tips：serve with gRPC, use batcher/queue, keep instances warm
 - `realtime/router/`:
   - FastAPI / gRPC router that:
@@ -142,15 +142,14 @@ Metrics collected: pCTR distribution, latency (P50/P90/P99), win-rate, eCPM, err
 
 ## Stream/
 
-- `stream/generator/`: 支持 Avazu/iPinYou/Criteo CSV replay，事件带 timestamp，可配置 QPS、burst 模式、随机 seed。
-  - 支持输出到: Kinesis Data Stream (boto3), Kafka (confluent-kafka-python)
-- `stream/locust/`: Locust 场景文件，用于施加 HTTP/gRPC 负载到 Router/Inference endpoints，并可读取 metrics 输出为 CSV
+stream/generator/: Supports Avazu/iPinYou/Criteo CSV replay with timestamps, configurable QPS, burst mode, and random seeds. Output to: Kinesis Data Stream (boto3), Kafka (confluent-kafka-python)
+stream/locust/: Locust scenario files for applying HTTP/gRPC load to Router/Inference endpoints and exporting metrics to CSV
 
 ---
 
 ## Monitoring/
 
-- `monitoring/model_monitor/`: SageMaker Model Monitor baseline job (baseline windows), 以及 drift detectors（pCTR vs observed CTR）
+- `monitoring/model_monitor/`: SageMaker Model Monitor baseline job (baseline windows), and drift detectors（pCTR vs observed CTR）
 - `monitoring/cloudwatch/`: CloudFormation templates for dashboards & alarms (latency, error rate, spend pacing)
 - `monitoring/observability/`: Prometheus exporter for router & model server, Grafana dashboard JSON
 
